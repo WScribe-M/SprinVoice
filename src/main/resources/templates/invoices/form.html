@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<h1>Facture</h1>
+<form th:action="@{/invoices/save}" th:object="${invoice}" method="post">
+    <input type="hidden" th:field="*{id}"/>
+    <label>Désignation</label>
+    <input type="text" th:field="*{designation}"/>
+    <button type="submit">Enregistrer</button>
+</form>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<h1>Factures</h1>
+<a href="/invoices/new">Nouvelle facture</a>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Désignation</th>
+        <th>Créée le</th>
+        <th>Actions</th>
+    </tr>
+    <tr th:each="invoice : ${invoices}">
+        <td th:text="${invoice.id}"/>
+        <td th:text="${invoice.designation}"/>
+        <td th:text="${invoice.createdAt}"/>
+        <td>
+            <a th:href="@{/invoices/{id}/edit(id=${invoice.id})}">Modifier</a>
+            <a th:href="@{/invoices/{id}/delete(id=${invoice.id})}">Supprimer</a>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

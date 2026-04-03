@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Créer un client</title>
+</head>
+<body>
+
+<h1>Créer un client</h1>
+
+<div th:if="${error}" th:text="${error}"></div>
+
+<form th:action="@{/admin/customers/create}" th:object="${dto}" method="post">
+
+    <h2>Informations client</h2>
+
+    <label>Nom
+        <input type="text" th:field="*{name}"/>
+    </label>
+    <label>Raison sociale
+        <input type="text" th:field="*{corporateName}"/>
+    </label>
+    <label>Adresse
+        <input type="text" th:field="*{address}"/>
+    </label>
+    <label>Code postal
+        <input type="text" th:field="*{zipcode}"/>
+    </label>
+    <label>Ville
+        <input type="text" th:field="*{city}"/>
+    </label>
+    <label>Délai de paiement (jours)
+        <input type="number" th:field="*{delay}"/>
+    </label>
+
+    <h2>Compte utilisateur</h2>
+
+    <label>Nom d'utilisateur
+        <input type="text" th:field="*{username}"/>
+    </label>
+    <label>Mot de passe
+        <input type="password" th:field="*{password}"/>
+    </label>
+
+    <button type="submit">Créer</button>
+
+</form>
+
+<a th:href="@{/admin/customers}">Retour à la liste</a>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion</title>
+</head>
+<body>
+
+<h1>Connexion</h1>
+
+<!-- Message d'erreur si mauvais identifiants -->
+<div th:if="${param.error}">
+    Identifiant ou mot de passe incorrect.
+</div>
+
+<!-- Message si déconnexion réussie -->
+<div th:if="${param.logout}">
+    Vous êtes déconnecté.
+</div>
+
+<!-- Spring Security attend exactement cette action et ces noms de champs -->
+<form th:action="@{/auth/login}" method="post">
+    <label>Nom d'utilisateur
+        <input type="text" name="username"/>
+    </label>
+    <label>Mot de passe
+        <input type="password" name="password"/>
+    </label>
+    <button type="submit">Se connecter</button>
+</form>
+
+<!--<a th:href="@{/auth/register}">Pas encore de compte ? S'inscrire</a>-->
+
+</body>
+</html>

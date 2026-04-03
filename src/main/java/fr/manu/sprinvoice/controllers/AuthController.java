@@ -22,32 +22,32 @@ public class AuthController {
         return "auth/login"; // → templates/login.html
     }
 
-    @GetMapping("/register")
-    public String registerPage() {
-        return "auth/register"; // → templates/register.html
-    }
+//    @GetMapping("/register")
+//    public String registerPage() {
+//        return "auth/register"; // → templates/register.html
+//    }
 
-    @Autowired private RoleRepository roleRepository;
+    //@Autowired private RoleRepository roleRepository;
 
-    @PostMapping("/register")
-    public String register(@RequestParam String username,
-                           @RequestParam String password,
-                           Model model) {
-        if (userRepository.findByUsername(username).isPresent()) {
-            model.addAttribute("error", "Ce nom d'utilisateur est déjà pris.");
-            return "auth/register";
-        }
-
-        // récupère le rôle CLIENT depuis la BDD
-        Role defaultRole = roleRepository.findByName("CLIENT")
-                .orElseThrow(() -> new RuntimeException("Rôle CLIENT introuvable en BDD"));
-
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password));
-        user.setRole(defaultRole);
-        userRepository.save(user);
-
-        return "redirect:/auth/login";
-    }
+//    @PostMapping("/register")
+//    public String register(@RequestParam String username,
+//                           @RequestParam String password,
+//                           Model model) {
+//        if (userRepository.findByUsername(username).isPresent()) {
+//            model.addAttribute("error", "Ce nom d'utilisateur est déjà pris.");
+//            return "auth/register";
+//        }
+//
+//        // récupère le rôle CLIENT depuis la BDD
+//        Role defaultRole = roleRepository.findByName("CLIENT")
+//                .orElseThrow(() -> new RuntimeException("Rôle CLIENT introuvable en BDD"));
+//
+//        User user = new User();
+//        user.setUsername(username);
+//        user.setPassword(passwordEncoder.encode(password));
+//        user.setRole(defaultRole);
+//        userRepository.save(user);
+//
+//        return "redirect:/auth/login";
+//    }
 }

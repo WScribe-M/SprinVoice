@@ -24,10 +24,11 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        System.out.println(">>> ROLE DETECTE : " + role.getName());
         return List.of(new SimpleGrantedAuthority(role.getName()));
     }
 
-    @ManyToOne()
+    @ManyToOne(fetch =  FetchType.EAGER)
     @JoinColumn(name = "ROLE_ID", nullable = false)
     private Role role;
 

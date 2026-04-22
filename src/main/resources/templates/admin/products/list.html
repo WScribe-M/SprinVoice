@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Produits</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f5f7fa; }
+        .content { padding: 24px; }
+        h1 { color: #1d3557; margin-bottom: 16px; }
+        .btn { display:inline-block; padding:8px 16px; border-radius:4px; text-decoration:none; font-size:14px; }
+        .btn-primary { background:#1d3557; color:#fff; }
+        .btn-warning { background:#f4a261; color:#fff; }
+        .btn-danger  { background:#e63946; color:#fff; }
+        table { width:100%; border-collapse:collapse; background:#fff; border-radius:6px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.08); margin-top:16px; }
+        th { background:#1d3557; color:#fff; padding:10px 14px; text-align:left; }
+        td { padding:10px 14px; border-bottom:1px solid #eee; }
+        tr:last-child td { border-bottom:none; }
+        .actions { display:flex; gap:8px; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+<div class="content">
+    <h1>Produits</h1>
+    <a th:href="@{/admin/products/create}" class="btn btn-primary">+ Nouveau produit</a>
+    <table>
+        <tr>
+            <th>Désignation</th>
+            <th>Catégorie</th>
+            <th>Prix unitaire (€)</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        <tr th:each="product : ${products}">
+            <td th:text="${product.designation}"></td>
+            <td th:text="${product.category}"></td>
+            <td th:text="${#numbers.formatDecimal(product.unitPrice, 1, 2)}"></td>
+            <td th:text="${product.description}"></td>
+            <td class="actions">
+                <a th:href="@{/admin/products/{id}/edit(id=${product.id})}" class="btn btn-warning">Modifier</a>
+                <a th:href="@{/admin/products/{id}/delete(id=${product.id})}" class="btn btn-danger"
+                   onclick="return confirm('Supprimer ce produit ?')">Supprimer</a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(products)}">
+            <td colspan="5" style="text-align:center;color:#999;">Aucun produit enregistré.</td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

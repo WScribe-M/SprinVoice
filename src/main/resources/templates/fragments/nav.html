@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<nav th:fragment="navbar" style="background:#1d3557;padding:12px 24px;margin-bottom:24px;display:flex;gap:20px;align-items:center;">
+    <strong style="color:#fff;font-size:18px;">SprinVoice</strong>
+    <a th:href="@{/invoices}" style="color:#a8d8ea;text-decoration:none;">Factures</a>
+    <span sec:authorize="hasAuthority('ROLE_ADMIN')" style="display:contents;">
+        <a th:href="@{/admin/customers}" style="color:#a8d8ea;text-decoration:none;">Clients</a>
+        <a th:href="@{/admin/products}" style="color:#a8d8ea;text-decoration:none;">Produits</a>
+    </span>
+    <span style="margin-left:auto;">
+        <span sec:authentication="name" style="color:#ccc;font-size:13px;margin-right:12px;"></span>
+        <a th:href="@{/auth/logout}" style="color:#f4a261;text-decoration:none;">Déconnexion</a>
+    </span>
+</nav>
+</body>
+</html>

@@ -24,10 +24,11 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        System.out.println(">>> ROLE DETECTE : " + role.getName());
         return List.of(new SimpleGrantedAuthority(role.getName()));
     }
 
-    @ManyToOne()
+    @ManyToOne(fetch =  FetchType.EAGER)
     @JoinColumn(name = "ROLE_ID", nullable = false)
     private Role role;
 
@@ -74,5 +75,25 @@ public class User implements UserDetails {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

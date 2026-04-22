@@ -1,7 +1,10 @@
 package fr.manu.sprinvoice.services;
 
+import fr.manu.sprinvoice.models.User;
 import fr.manu.sprinvoice.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,7 +19,11 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
+        System.out.println(">>> CHARGEMENT USER : " + username);
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable : " + username));
+        System.out.println(">>> ROLE : " + user.getRole().getName());
+        return user;
     }
+
 }

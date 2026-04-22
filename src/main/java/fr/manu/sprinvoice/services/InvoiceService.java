@@ -18,6 +18,10 @@ public class InvoiceService {
         return invoiceRepository.findAll();
     }
 
+    public List<Invoice> findByCustomerId(int customerId) {
+        return invoiceRepository.findByCustomerId(customerId);
+    }
+
     public Invoice findById(int id) {
         return invoiceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Facture introuvable : " + id));

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Clients</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f5f7fa; }
+        .content { padding: 24px; }
+        h1 { color: #1d3557; margin-bottom: 16px; }
+        .btn { display:inline-block; padding:8px 16px; border-radius:4px; text-decoration:none; font-size:14px; }
+        .btn-primary { background:#1d3557; color:#fff; }
+        .btn-warning { background:#f4a261; color:#fff; }
+        .btn-danger  { background:#e63946; color:#fff; }
+        table { width:100%; border-collapse:collapse; background:#fff; border-radius:6px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.08); margin-top:16px; }
+        th { background:#1d3557; color:#fff; padding:10px 14px; text-align:left; }
+        td { padding:10px 14px; border-bottom:1px solid #eee; }
+        tr:last-child td { border-bottom:none; }
+        .actions { display:flex; gap:8px; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+<div class="content">
+    <h1>Clients</h1>
+    <a th:href="@{/admin/customers/create}" class="btn btn-primary">+ Nouveau client</a>
+    <table>
+        <tr>
+            <th>Nom</th>
+            <th>Raison sociale</th>
+            <th>Ville</th>
+            <th>Délai (j)</th>
+            <th>Actions</th>
+        </tr>
+        <tr th:each="customer : ${customers}">
+            <td th:text="${customer.name}"></td>
+            <td th:text="${customer.corporateName}"></td>
+            <td th:text="${customer.city}"></td>
+            <td th:text="${customer.delay}"></td>
+            <td class="actions">
+                <a th:href="@{/admin/customers/{id}/edit(id=${customer.id})}" class="btn btn-warning">Modifier</a>
+                <a th:href="@{/admin/customers/{id}/delete(id=${customer.id})}" class="btn btn-danger"
+                   onclick="return confirm('Supprimer ce client ?')">Supprimer</a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(customers)}">
+            <td colspan="5" style="text-align:center;color:#999;">Aucun client enregistré.</td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

@@ -1,25 +1,64 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Factures</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f5f7fa; }
+        .content { padding: 24px; }
+        h1 { color: #1d3557; margin-bottom: 16px; }
+        .btn { display:inline-block; padding:8px 16px; border-radius:4px; text-decoration:none; font-size:14px; }
+        .btn-primary  { background:#1d3557; color:#fff; }
+        .btn-warning  { background:#f4a261; color:#fff; }
+        .btn-danger   { background:#e63946; color:#fff; }
+        .btn-info     { background:#457b9d; color:#fff; }
+        table { width:100%; border-collapse:collapse; background:#fff; border-radius:6px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.08); margin-top:16px; }
+        th { background:#1d3557; color:#fff; padding:10px 14px; text-align:left; }
+        td { padding:10px 14px; border-bottom:1px solid #eee; }
+        tr:last-child td { border-bottom:none; }
+        .actions { display:flex; gap:8px; }
+        .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:bold; }
+        .badge-paid   { background:#d4edda; color:#155724; }
+        .badge-unpaid { background:#fff3cd; color:#856404; }
+    </style>
+</head>
 <body>
-<h1>Factures</h1>
-<a sec:authorize="hasAuthority('ROLE_ADMIN')" th:href="@{/invoices/new}">Nouvelle facture</a>
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Désignation</th>
-        <th>Créée le</th>
-        <th sec:authorize="hasAuthority('ROLE_ADMIN')">Actions</th>
-    </tr>
-    <tr th:each="invoice : ${invoices}">
-        <td th:text="${invoice.id}"/>
-        <td th:text="${invoice.designation}"/>
-        <td th:text="${invoice.createdAt}"/>
-        <td sec:authorize="hasAuthority('ROLE_ADMIN')">
-            <a th:href="@{/invoices/{id}/edit(id=${invoice.id})}">Modifier</a>
-            <a th:href="@{/invoices/{id}/delete(id=${invoice.id})}">Supprimer</a>
-        </td>
-    </tr>
-</table>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+<div class="content">
+    <h1>Factures</h1>
+    <a sec:authorize="hasAuthority('ROLE_ADMIN')" th:href="@{/admin/invoices/new}" class="btn btn-primary">+ Nouvelle facture</a>
+    <table>
+        <tr>
+            <th>Désignation</th>
+            <th>Client</th>
+            <th>Créée le</th>
+            <th>Statut</th>
+            <th>Total</th>
+            <th>Actions</th>
+        </tr>
+        <tr th:each="invoice : ${invoices}">
+            <td th:text="${invoice.designation}"></td>
+            <td th:text="${invoice.customer != null} ? ${invoice.customer.name} : '–'"></td>
+            <td th:text="${invoice.createdAt != null} ? ${#temporals.format(invoice.createdAt,'dd/MM/yyyy')} : '–'"></td>
+            <td>
+                <span th:if="${invoice.paidAt != null}" class="badge badge-paid">Payée</span>
+                <span th:if="${invoice.paidAt == null}" class="badge badge-unpaid">En attente</span>
+            </td>
+            <td th:text="${#numbers.formatDecimal(invoice.total(), 1, 2)} + ' €'"></td>
+            <td class="actions">
+                <a th:href="@{/invoices/{id}(id=${invoice.id})}" class="btn btn-info">Voir</a>
+                <a sec:authorize="hasAuthority('ROLE_ADMIN')"
+                   th:href="@{/admin/invoices/{id}/edit(id=${invoice.id})}" class="btn btn-warning">Modifier</a>
+                <a sec:authorize="hasAuthority('ROLE_ADMIN')"
+                   th:href="@{/admin/invoices/{id}/delete(id=${invoice.id})}" class="btn btn-danger"
+                   onclick="return confirm('Supprimer cette facture ?')">Supprimer</a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(invoices)}">
+            <td colspan="6" style="text-align:center;color:#999;">Aucune facture.</td>
+        </tr>
+    </table>
+</div>
 </body>
 </html>

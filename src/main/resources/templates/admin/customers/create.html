@@ -3,8 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Créer un client</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f5f7fa; }
+        .content { padding: 24px; max-width: 600px; }
+        h1 { color: #1d3557; margin-bottom: 20px; }
+        h2 { color: #457b9d; font-size: 15px; margin: 20px 0 10px 0; }
+        label { display:block; font-size:13px; color:#555; margin-bottom:4px; margin-top:10px; }
+        input { width:100%; padding:8px 10px; border:1px solid #ccc; border-radius:4px; font-size:14px; box-sizing:border-box; }
+        .error { color:#e63946; margin-bottom:12px; }
+        .btn { display:inline-block; padding:9px 20px; border-radius:4px; text-decoration:none; font-size:14px; border:none; cursor:pointer; }
+        .btn-primary { background:#1d3557; color:#fff; }
+        .btn-secondary { background:#ccc; color:#333; }
+    </style>
 </head>
 <body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+<div class="content">
 
 <h1>Créer un client</h1>
 
@@ -42,11 +56,11 @@
         <input type="password" th:field="*{password}"/>
     </label>
 
-    <button type="submit">Créer</button>
-
-</form>
-
-<a th:href="@{/admin/customers}">Retour à la liste</a>
-
+        <div style="display:flex;gap:10px;margin-top:20px;">
+            <button type="submit" class="btn btn-primary">Créer</button>
+            <a th:href="@{/admin/customers}" class="btn btn-secondary">Annuler</a>
+        </div>
+    </form>
+</div>
 </body>
 </html>

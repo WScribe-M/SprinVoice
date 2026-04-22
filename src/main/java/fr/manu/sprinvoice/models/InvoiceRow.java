@@ -11,7 +11,7 @@ public class InvoiceRow {
     private Integer id;
 
     @Column(name = "QUANTITY")
-    private Float quantity;
+    private Integer quantity;
 
     @ManyToOne
     @JoinColumn(name = "INVOICE_ID")
@@ -29,11 +29,11 @@ public class InvoiceRow {
         this.id = id;
     }
 
-    public Float getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Float quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 

@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class CustomerService {
 
@@ -20,10 +22,25 @@ public class CustomerService {
     @Autowired private RoleRepository roleRepository;
     @Autowired private PasswordEncoder passwordEncoder;
 
-    @Transactional // si une des deux insertions échoue, les deux sont annulées
-    public void createCustomerWithAccount(CreateCustomerDTO dto) {
+    public List<Customer> findAll() {
+        return customerRepository.findAll();
+    }
 
-        // 1. Créer le Customer
+    public Customer findById(int id) {
+        return customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Client introuvable : " + id));
+    }
+
+    public Customer save(Customer customer) {
+        return customerRepository.save(customer);
+    }
+
+    public void deleteById(int id) {
+        customerRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void createCustomerWithAccount(CreateCustomerDTO dto) {
         Customer customer = new Customer();
         customer.setName(dto.getName());
         customer.setCorporateName(dto.getCorporateName());
@@ -33,11 +50,9 @@ public class CustomerService {
         customer.setDelay(dto.getDelay());
         customerRepository.save(customer);
 
-        // 2. Récupérer le rôle CLIENT
         Role clientRole = roleRepository.findByName("ROLE_CLIENT")
                 .orElseThrow(() -> new RuntimeException("Rôle ROLE_CLIENT introuvable"));
 
-        // 3. Créer le User lié à ce Customer
         User user = new User();
         user.setUsername(dto.getUsername());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));

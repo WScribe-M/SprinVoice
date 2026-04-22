@@ -2,14 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>Facture</title>
+    <title>Produit</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; background: #f5f7fa; }
-        .content { padding: 24px; max-width: 600px; }
+        .content { padding: 24px; max-width: 500px; }
         h1 { color: #1d3557; margin-bottom: 20px; }
         .form-group { margin-bottom: 14px; }
         label { display:block; font-size:13px; color:#555; margin-bottom:4px; }
-        input, select { width:100%; padding:8px 10px; border:1px solid #ccc; border-radius:4px; font-size:14px; box-sizing:border-box; }
+        input, textarea { width:100%; padding:8px 10px; border:1px solid #ccc; border-radius:4px; font-size:14px; box-sizing:border-box; }
+        textarea { height:80px; resize:vertical; }
         .btn { display:inline-block; padding:9px 20px; border-radius:4px; text-decoration:none; font-size:14px; border:none; cursor:pointer; }
         .btn-primary { background:#1d3557; color:#fff; }
         .btn-secondary { background:#ccc; color:#333; }
@@ -18,34 +19,28 @@
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
 <div class="content">
-    <h1 th:text="${dto.id != 0} ? 'Modifier la facture' : 'Nouvelle facture'"></h1>
-    <form th:action="@{/admin/invoices/save}" th:object="${dto}" method="post">
+    <h1 th:text="${product.id != 0} ? 'Modifier le produit' : 'Nouveau produit'"></h1>
+    <form th:action="@{/admin/products/save}" th:object="${product}" method="post">
         <input type="hidden" th:field="*{id}"/>
-        <div class="form-group">
-            <label>Client</label>
-            <select th:field="*{customerId}" required>
-                <option value="0">-- Sélectionner un client --</option>
-                <option th:each="c : ${customers}"
-                        th:value="${c.id}"
-                        th:text="${c.name} + ' – ' + ${c.corporateName}">
-                </option>
-            </select>
-        </div>
         <div class="form-group">
             <label>Désignation</label>
             <input type="text" th:field="*{designation}" required/>
         </div>
         <div class="form-group">
-            <label>Date de facturation</label>
-            <input type="date" th:field="*{invoicedAt}"/>
+            <label>Catégorie</label>
+            <input type="text" th:field="*{category}"/>
         </div>
         <div class="form-group">
-            <label>Date de paiement</label>
-            <input type="date" th:field="*{paidAt}"/>
+            <label>Prix unitaire (€)</label>
+            <input type="number" th:field="*{unitPrice}" step="0.01" min="0" required/>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea th:field="*{description}"></textarea>
         </div>
         <div style="display:flex;gap:10px;margin-top:20px;">
             <button type="submit" class="btn btn-primary">Enregistrer</button>
-            <a th:href="@{/invoices}" class="btn btn-secondary">Annuler</a>
+            <a th:href="@{/admin/products}" class="btn btn-secondary">Annuler</a>
         </div>
     </form>
 </div>

@@ -48,6 +48,8 @@
         .btn-danger    { background:#e63946; color:#fff; }
         .btn-secondary { background:#dde3ea; color:#333; }
         .btn-sm { padding: 5px 10px; font-size: 12px; }
+        .btn-pdf { background: #2d6a4f; color: #fff; }
+        .btn-pdf:hover { background: #245740; }
     </style>
 </head>
 <body>
@@ -163,7 +165,10 @@
         </form>
     </div>
 
-    <a th:href="@{/invoices}" class="btn btn-secondary">← Retour à la liste</a>
+    <div style="display:flex;gap:10px;align-items:center;">
+        <a th:href="@{/invoices}" class="btn btn-secondary">← Retour à la liste</a>
+        <a th:href="@{/invoices/{id}/pdf(id=${invoice.id})}" class="btn btn-pdf">⬇ Télécharger PDF</a>
+    </div>
 </div>
 </body>
 </html>

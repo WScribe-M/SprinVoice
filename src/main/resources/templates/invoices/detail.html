@@ -15,6 +15,7 @@
         .invoice-header .badge { margin-left: 12px; font-size: 12px; font-weight: bold; padding: 3px 12px; border-radius: 12px; }
         .badge-paid   { background: #d4edda; color: #155724; }
         .badge-unpaid { background: #fff3cd; color: #856404; }
+        .badge-overdue { background: #f8d7da; color: #721c24; }
 
         /* Cartes d'information */
         .info-row { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -61,7 +62,10 @@
         <div style="display:flex;align-items:center;gap:10px;">
             <h1 th:text="${invoice.designation}">Désignation</h1>
             <span th:if="${invoice.paidAt != null}" class="badge badge-paid">Payée</span>
-            <span th:if="${invoice.paidAt == null}" class="badge badge-unpaid">En attente</span>
+            <span th:if="${invoice.paidAt == null and invoice.invoicedAt != null and invoice.customer != null and invoice.invoicedAt.plusDays(invoice.customer.delay).isBefore(T(java.time.LocalDateTime).now())}"
+                class="badge badge-overdue">En retard</span>
+            <span th:if="${invoice.paidAt == null and !(invoice.invoicedAt != null and invoice.customer != null and invoice.invoicedAt.plusDays(invoice.customer.delay).isBefore(T(java.time.LocalDateTime).now()))}"
+                class="badge badge-unpaid">En attente</span>
         </div>
         <div class="meta">
             <span sec:authorize="hasAuthority('ROLE_ADMIN')">

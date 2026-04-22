@@ -1,35 +1,214 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Connexion</title>
+    <meta charset="UTF-8"/>
+    <title>Connexion – SprinVoice</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-wrapper {
+            display: flex;
+            width: 820px;
+            min-height: 480px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,.15);
+        }
+
+        /* Panneau gauche – branding */
+        .brand-panel {
+            background: #1d3557;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: #fff;
+            text-align: center;
+        }
+
+        .brand-panel .logo {
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .brand-panel .logo span {
+            color: #f4a261;
+        }
+
+        .brand-panel .tagline {
+            font-size: 14px;
+            color: #a8d8ea;
+            line-height: 1.6;
+            max-width: 220px;
+        }
+
+        .brand-panel .deco {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .deco-line {
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,.15);
+        }
+
+        .deco-line:nth-child(1) { width: 60%; }
+        .deco-line:nth-child(2) { width: 80%; }
+        .deco-line:nth-child(3) { width: 45%; }
+
+        /* Panneau droit – formulaire */
+        .form-panel {
+            background: #fff;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 48px 40px;
+        }
+
+        .form-panel h2 {
+            font-size: 22px;
+            color: #1d3557;
+            margin-bottom: 6px;
+        }
+
+        .form-panel .welcome {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #d0dce8;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #1a1a1a;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .form-group input:focus {
+            border-color: #457b9d;
+            box-shadow: 0 0 0 3px rgba(69,123,157,.12);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #1d3557;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background .2s;
+        }
+
+        .btn-login:hover {
+            background: #16304e;
+        }
+
+        /* Messages */
+        .alert {
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-error {
+            background: #fdecea;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Connexion</h1>
+<div class="login-wrapper">
 
-<!-- Message d'erreur si mauvais identifiants -->
-<div th:if="${param.error}">
-    Identifiant ou mot de passe incorrect.
+    <!-- Panneau gauche -->
+    <div class="brand-panel">
+        <div class="logo">Sprin<span>Voice</span></div>
+        <p class="tagline">Gestion de facturation simple et efficace</p>
+        <div class="deco">
+            <div class="deco-line"></div>
+            <div class="deco-line"></div>
+            <div class="deco-line"></div>
+        </div>
+    </div>
+
+    <!-- Panneau droit -->
+    <div class="form-panel">
+        <h2>Connexion</h2>
+        <p class="welcome">Bienvenue, veuillez vous identifier.</p>
+
+        <div th:if="${param.error}" class="alert alert-error">
+            ⚠ Identifiant ou mot de passe incorrect.
+        </div>
+
+        <div th:if="${param.logout}" class="alert alert-success">
+            ✓ Vous avez été déconnecté avec succès.
+        </div>
+
+        <form th:action="@{/auth/login}" method="post">
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" name="username" placeholder="Votre identifiant" required autofocus/>
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required/>
+            </div>
+            <button type="submit" class="btn-login">Se connecter</button>
+        </form>
+    </div>
+
 </div>
-
-<!-- Message si déconnexion réussie -->
-<div th:if="${param.logout}">
-    Vous êtes déconnecté.
-</div>
-
-<!-- Spring Security attend exactement cette action et ces noms de champs -->
-<form th:action="@{/auth/login}" method="post">
-    <label>Nom d'utilisateur
-        <input type="text" name="username"/>
-    </label>
-    <label>Mot de passe
-        <input type="password" name="password"/>
-    </label>
-    <button type="submit">Se connecter</button>
-</form>
-
-<!--<a th:href="@{/auth/register}">Pas encore de compte ? S'inscrire</a>-->
 
 </body>
 </html>

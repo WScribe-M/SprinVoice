@@ -2,13 +2,18 @@ package fr.manu.sprinvoice.controllers;
 
 import fr.manu.sprinvoice.dto.InvoiceFormDTO;
 import fr.manu.sprinvoice.models.Invoice;
+import fr.manu.sprinvoice.models.InvoiceRow;
 import fr.manu.sprinvoice.models.User;
 import fr.manu.sprinvoice.services.CustomerService;
+import fr.manu.sprinvoice.services.InvoicePdfService;
 import fr.manu.sprinvoice.services.InvoiceRowService;
 import fr.manu.sprinvoice.services.InvoiceService;
 import fr.manu.sprinvoice.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +31,7 @@ public class InvoiceController {
     @Autowired private CustomerService customerService;
     @Autowired private ProductService productService;
     @Autowired private InvoiceRowService invoiceRowService;
+    @Autowired private InvoicePdfService invoicePdfService;
 
     // ── Accès CLIENT + ADMIN ──────────────────────────────────────
 
@@ -56,6 +62,25 @@ public class InvoiceController {
         model.addAttribute("rows", invoiceRowService.findByInvoiceId(id));
         model.addAttribute("products", productService.findAll());
         return "invoices/detail";
+    }
+
+    @GetMapping("/invoices/{id}/pdf")
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable int id, Authentication authentication) {
+        Invoice invoice = invoiceService.findById(id);
+        User user = (User) authentication.getPrincipal();
+        if (!user.getRole().getName().equals("ROLE_ADMIN")) {
+            if (user.getCustomer() == null || invoice.getCustomer() == null
+                    || user.getCustomer().getId() != invoice.getCustomer().getId()) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+        }
+        List<InvoiceRow> rows = invoiceRowService.findByInvoiceId(id);
+        byte[] pdf = invoicePdfService.generate(invoice, rows);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "facture-" + id + ".pdf");
+        return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
     }
 
     // ── ADMIN seulement (sous /admin/invoices/**) ─────────────────

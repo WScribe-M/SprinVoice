@@ -11,7 +11,9 @@
     </span>
     <span style="margin-left:auto;">
         <span sec:authentication="name" style="color:#ccc;font-size:13px;margin-right:12px;"></span>
-        <a th:href="@{/auth/logout}" style="color:#f4a261;text-decoration:none;">Déconnexion</a>
+        <form th:action="@{/auth/logout}" method="post" style="display:inline;">
+            <button type="submit" style="background:none;border:none;color:#f4a261;cursor:pointer;font-size:14px;padding:0;">Déconnexion</button>
+        </form>
     </span>
 </nav>
 </body>

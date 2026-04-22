@@ -3,6 +3,8 @@ package fr.manu.sprinvoice.services;
 import fr.manu.sprinvoice.models.User;
 import fr.manu.sprinvoice.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,4 +25,5 @@ public class CustomUserDetailsService implements UserDetailsService {
         System.out.println(">>> ROLE : " + user.getRole().getName());
         return user;
     }
+
 }

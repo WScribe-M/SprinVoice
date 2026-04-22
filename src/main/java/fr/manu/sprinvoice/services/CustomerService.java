@@ -34,8 +34,8 @@ public class CustomerService {
         customerRepository.save(customer);
 
         // 2. Récupérer le rôle CLIENT
-        Role clientRole = roleRepository.findByName("CLIENT")
-                .orElseThrow(() -> new RuntimeException("Rôle CLIENT introuvable"));
+        Role clientRole = roleRepository.findByName("ROLE_CLIENT")
+                .orElseThrow(() -> new RuntimeException("Rôle ROLE_CLIENT introuvable"));
 
         // 3. Créer le User lié à ce Customer
         User user = new User();

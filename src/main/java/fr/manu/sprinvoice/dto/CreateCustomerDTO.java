@@ -1,5 +1,8 @@
 package fr.manu.sprinvoice.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+
 public class CreateCustomerDTO {
     private String name;
     private String corporateName;
@@ -9,7 +12,14 @@ public class CreateCustomerDTO {
     private int delay;
 
     // Infos User
+    @NotBlank
     private String username;
+
+    @NotBlank
+    @Pattern(
+        regexp = "^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$",
+        message = "Le mot de passe doit contenir au moins 8 caractères, une majuscule, un chiffre et un caractère spécial."
+    )
     private String password;
 
     // getters / setters

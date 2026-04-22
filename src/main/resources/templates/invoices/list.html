@@ -80,9 +80,11 @@
                 <a th:href="@{/invoices/{id}(id=${invoice.id})}" class="btn btn-info">Voir</a>
                 <a sec:authorize="hasAuthority('ROLE_ADMIN')"
                    th:href="@{/admin/invoices/{id}/edit(id=${invoice.id})}" class="btn btn-warning">Modifier</a>
-                <a sec:authorize="hasAuthority('ROLE_ADMIN')"
-                   th:href="@{/admin/invoices/{id}/delete(id=${invoice.id})}" class="btn btn-danger"
-                   onclick="return confirm('Supprimer cette facture ?')">Supprimer</a>
+                <form sec:authorize="hasAuthority('ROLE_ADMIN')"
+                      th:action="@{/admin/invoices/{id}/delete(id=${invoice.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger"
+                            onclick="return confirm('Supprimer cette facture ?')">Supprimer</button>
+                </form>
             </td>
         </tr>
         <tr th:if="${#lists.isEmpty(invoices)}">

@@ -24,7 +24,6 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        System.out.println(">>> ROLE DETECTE : " + role.getName());
         return List.of(new SimpleGrantedAuthority(role.getName()));
     }
 

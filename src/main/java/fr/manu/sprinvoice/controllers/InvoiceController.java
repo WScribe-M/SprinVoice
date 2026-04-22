@@ -8,10 +8,12 @@ import fr.manu.sprinvoice.services.InvoiceRowService;
 import fr.manu.sprinvoice.services.InvoiceService;
 import fr.manu.sprinvoice.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,8 +43,16 @@ public class InvoiceController {
     }
 
     @GetMapping("/invoices/{id}")
-    public String detail(@PathVariable int id, Model model) {
-        model.addAttribute("invoice", invoiceService.findById(id));
+    public String detail(@PathVariable int id, Model model, Authentication authentication) {
+        Invoice invoice = invoiceService.findById(id);
+        User user = (User) authentication.getPrincipal();
+        if (!user.getRole().getName().equals("ROLE_ADMIN")) {
+            if (user.getCustomer() == null || invoice.getCustomer() == null
+                    || user.getCustomer().getId() != invoice.getCustomer().getId()) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+        }
+        model.addAttribute("invoice", invoice);
         model.addAttribute("rows", invoiceRowService.findByInvoiceId(id));
         model.addAttribute("products", productService.findAll());
         return "invoices/detail";
@@ -96,13 +106,13 @@ public class InvoiceController {
         return "redirect:/invoices/" + id;
     }
 
-    @GetMapping("/admin/invoices/{invoiceId}/rows/{rowId}/delete")
+    @PostMapping("/admin/invoices/{invoiceId}/rows/{rowId}/delete")
     public String deleteRow(@PathVariable int invoiceId, @PathVariable int rowId) {
         invoiceRowService.deleteById(rowId);
         return "redirect:/invoices/" + invoiceId;
     }
 
-    @GetMapping("/admin/invoices/{id}/delete")
+    @PostMapping("/admin/invoices/{id}/delete")
     public String delete(@PathVariable int id) {
         invoiceService.deleteById(id);
         return "redirect:/invoices";

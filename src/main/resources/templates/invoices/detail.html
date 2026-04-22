@@ -100,8 +100,10 @@
     <!-- Boutons admin -->
     <div sec:authorize="hasAuthority('ROLE_ADMIN')" style="margin-bottom:16px;display:flex;gap:8px;">
         <a th:href="@{/admin/invoices/{id}/edit(id=${invoice.id})}" class="btn btn-warning">Modifier</a>
-        <a th:href="@{/admin/invoices/{id}/delete(id=${invoice.id})}" class="btn btn-danger"
-           onclick="return confirm('Supprimer cette facture ?')">Supprimer</a>
+        <form th:action="@{/admin/invoices/{id}/delete(id=${invoice.id})}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger"
+                    onclick="return confirm('Supprimer cette facture ?')">Supprimer</button>
+        </form>
     </div>
 
     <!-- Lignes de facturation -->
@@ -123,9 +125,11 @@
                 <td th:text="${row.quantity}"></td>
                 <td th:text="${#numbers.formatDecimal(row.amount(), 1, 2)} + ' €'"></td>
                 <td sec:authorize="hasAuthority('ROLE_ADMIN')">
-                    <a th:href="@{/admin/invoices/{iid}/rows/{rid}/delete(iid=${invoice.id},rid=${row.id})}"
-                       class="btn btn-danger btn-sm"
-                       onclick="return confirm('Supprimer cette ligne ?')">✕</a>
+                    <form th:action="@{/admin/invoices/{iid}/rows/{rid}/delete(iid=${invoice.id},rid=${row.id})}"
+                          method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Supprimer cette ligne ?')">✕</button>
+                    </form>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(rows)}">

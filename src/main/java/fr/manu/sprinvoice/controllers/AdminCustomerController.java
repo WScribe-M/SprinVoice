@@ -4,9 +4,11 @@ import fr.manu.sprinvoice.dto.CreateCustomerDTO;
 import fr.manu.sprinvoice.models.Customer;
 import fr.manu.sprinvoice.repositories.UserRepository;
 import fr.manu.sprinvoice.services.CustomerService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -29,7 +31,15 @@ public class AdminCustomerController {
     }
 
     @PostMapping("/create")
-    public String create(@ModelAttribute CreateCustomerDTO dto, Model model) {
+    public String create(@Valid @ModelAttribute CreateCustomerDTO dto, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            String msg = result.getFieldErrors().stream()
+                    .map(e -> e.getDefaultMessage())
+                    .findFirst().orElse("Données invalides.");
+            model.addAttribute("error", msg);
+            model.addAttribute("dto", dto);
+            return "admin/customers/create";
+        }
         if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
             model.addAttribute("error", "Ce nom d'utilisateur est déjà pris.");
             model.addAttribute("dto", dto);
@@ -52,7 +62,7 @@ public class AdminCustomerController {
         return "redirect:/admin/customers";
     }
 
-    @GetMapping("/{id}/delete")
+    @PostMapping("/{id}/delete")
     public String delete(@PathVariable int id) {
         customerService.deleteById(id);
         return "redirect:/admin/customers";

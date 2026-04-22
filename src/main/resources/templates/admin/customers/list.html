@@ -39,8 +39,10 @@
             <td th:text="${customer.delay}"></td>
             <td class="actions">
                 <a th:href="@{/admin/customers/{id}/edit(id=${customer.id})}" class="btn btn-warning">Modifier</a>
-                <a th:href="@{/admin/customers/{id}/delete(id=${customer.id})}" class="btn btn-danger"
-                   onclick="return confirm('Supprimer ce client ?')">Supprimer</a>
+                <form th:action="@{/admin/customers/{id}/delete(id=${customer.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger"
+                            onclick="return confirm('Supprimer ce client ?')">Supprimer</button>
+                </form>
             </td>
         </tr>
         <tr th:if="${#lists.isEmpty(customers)}">

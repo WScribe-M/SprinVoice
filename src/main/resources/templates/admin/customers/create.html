@@ -22,7 +22,8 @@
 
 <h1>Créer un client</h1>
 
-<div th:if="${error}" th:text="${error}"></div>
+<div th:if="${error}" th:text="${error}"
+     style="background:#fdecea;border:1px solid #f5c6cb;color:#721c24;padding:10px 14px;border-radius:6px;margin-bottom:16px;font-size:13px;"></div>
 
 <form th:action="@{/admin/customers/create}" th:object="${dto}" method="post">
 
@@ -54,6 +55,7 @@
     </label>
     <label>Mot de passe
         <input type="password" th:field="*{password}"/>
+        <small style="color:#888;font-size:11px;">8 caractères min. · 1 majuscule · 1 chiffre · 1 caractère spécial</small>
     </label>
 
         <div style="display:flex;gap:10px;margin-top:20px;">

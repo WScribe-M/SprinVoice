@@ -4,6 +4,7 @@
 <body>
 <nav th:fragment="navbar" style="background:#1d3557;padding:12px 24px;margin-bottom:24px;display:flex;gap:20px;align-items:center;">
     <strong style="color:#fff;font-size:18px;">SprinVoice</strong>
+    <a th:href="@{/dashboard}" style="color:#a8d8ea;text-decoration:none;">Dashboard</a>
     <a th:href="@{/invoices}" style="color:#a8d8ea;text-decoration:none;">Factures</a>
     <span sec:authorize="hasAuthority('ROLE_ADMIN')" style="display:contents;">
         <a th:href="@{/admin/customers}" style="color:#a8d8ea;text-decoration:none;">Clients</a>

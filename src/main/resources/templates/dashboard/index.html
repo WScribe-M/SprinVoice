@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SprinVoice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #1d3557;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #a8d8ea;
+        }
+
+        .stat-card.alert {
+            border-left-color: #f4a261;
+        }
+
+        .stat-card.success {
+            border-left-color: #2a9d8f;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1d3557;
+            margin-bottom: 4px;
+        }
+
+        .stat-description {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1d3557;
+        }
+
+        .overdue-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        .overdue-table th {
+            background: #f5f7fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            color: #666;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .overdue-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 13px;
+        }
+
+        .overdue-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.overdue {
+            background: #ffe0e0;
+            color: #d32f2f;
+        }
+
+        .status-badge.paid {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-badge.pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .amount {
+            font-weight: 600;
+            color: #1d3557;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                min-width: 100%;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{fragments/nav :: navbar}"></div>
+
+    <div class="container">
+        <h1 class="page-title">Dashboard</h1>
+
+        <!-- ADMIN VIEW -->
+        <div sec:authorize="hasAuthority('ROLE_ADMIN')">
+            <!-- Key Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Chiffre d'affaires du mois</div>
+                    <div class="stat-value" th:text="'€ ' + ${#numbers.formatDecimal(monthlyRevenue, 1, 'COMMA', 2, 'POINT')}">€ 0,00</div>
+                    <div class="stat-description">Factures du mois courant</div>
+                </div>
+
+                <div class="stat-card alert" th:if="${overdueCount > 0}">
+                    <div class="stat-label">Factures en retard</div>
+                    <div class="stat-value" th:text="${overdueCount}">0</div>
+                    <div class="stat-description" th:text="'Montant: €' + ${#numbers.formatDecimal(overdueAmount, 1, 'COMMA', 2, 'POINT')}">Montant: € 0,00</div>
+                </div>
+
+                <div class="stat-card success" th:if="${overdueCount == 0}">
+                    <div class="stat-label">Factures en retard</div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-description">Aucune facture en retard ✓</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title">Chiffre d'affaires - 12 derniers mois</div>
+                    <canvas id="revenueChart" style="max-height: 300px;"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">État des factures</div>
+                    <canvas id="statusChart" style="max-height: 300px;"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">Top 10 clients par chiffre d'affaires</div>
+                    <canvas id="customersChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Overdue Invoices Table -->
+            <div class="chart-card" th:if="${overdueInvoices.size() > 0}">
+                <div class="chart-title">Factures en retard de paiement</div>
+                <table class="overdue-table">
+                    <thead>
+                        <tr>
+                            <th>Numéro</th>
+                            <th>Client</th>
+                            <th>Montant</th>
+                            <th>Date facture</th>
+                            <th>Jours en retard</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="invoice : ${overdueInvoices}">
+                            <td>
+                                <a th:href="@{/invoices/{id}(id=${invoice.id})}" 
+                                   style="color: #a8d8ea; text-decoration: none;">
+                                   <strong>#INV-<span th:text="${invoice.id}"></span></strong>
+                                </a>
+                            </td>
+                            <td th:text="${invoice.customer.name}">Client</td>
+                            <td>
+                                <span class="amount" th:text="'€ ' + ${#numbers.formatDecimal(invoice.total(), 1, 'COMMA', 2, 'POINT')}">€ 0,00</span>
+                            </td>
+                            <td th:text="${#temporals.format(invoice.invoicedAt, 'dd/MM/yyyy')}">01/01/2024</td>
+                            <td>
+                                <span class="status-badge overdue">
+                                    <span th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(invoice.invoicedAt, T(java.time.LocalDateTime).now())} + ' jours'"></span>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${overdueInvoices.size() == 0}" class="chart-card">
+                <div class="no-data">✓ Aucune facture en retard</div>
+            </div>
+        </div>
+
+        <!-- CLIENT VIEW -->
+        <div sec:authorize="!hasAuthority('ROLE_ADMIN')">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total de mes factures</div>
+                    <div class="stat-value" th:text="'€ ' + ${#numbers.formatDecimal(monthlyRevenue, 1, 'COMMA', 2, 'POINT')}">€ 0,00</div>
+                    <div class="stat-description">Montant total facturé</div>
+                </div>
+
+                <div class="stat-card success">
+                    <div class="stat-label">Factures payées</div>
+                    <div class="stat-value" th:text="${paidCount}">0</div>
+                    <div class="stat-description" th:text="${totalCount} + ' facture(s) au total'"></div>
+                </div>
+
+                <div class="stat-card alert" th:if="${overdueInvoices.size() > 0}">
+                    <div class="stat-label">En attente de paiement</div>
+                    <div class="stat-value" th:text="${totalCount - paidCount}">0</div>
+                    <div class="stat-description" th:text="${overdueInvoices.size()} + ' facture(s) en retard'"></div>
+                </div>
+            </div>
+
+            <div class="chart-card" th:if="${overdueInvoices.size() > 0}">
+                <div class="chart-title">Vos factures en retard</div>
+                <table class="overdue-table">
+                    <thead>
+                        <tr>
+                            <th>Numéro</th>
+                            <th>Montant</th>
+                            <th>Date facture</th>
+                            <th>Jours en retard</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="invoice : ${overdueInvoices}">
+                            <td>
+                                <a th:href="@{/invoices/{id}(id=${invoice.id})}" 
+                                   style="color: #a8d8ea; text-decoration: none;">
+                                   <strong>#INV-<span th:text="${invoice.id}"></span></strong>
+                                </a>
+                            </td>
+                            <td>
+                                <span class="amount" th:text="'€ ' + ${#numbers.formatDecimal(invoice.total(), 1, 'COMMA', 2, 'POINT')}">€ 0,00</span>
+                            </td>
+                            <td th:text="${#temporals.format(invoice.invoicedAt, 'dd/MM/yyyy')}">01/01/2024</td>
+                            <td>
+                                <span class="status-badge overdue">
+                                    <span th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(invoice.invoicedAt, T(java.time.LocalDateTime).now())} + ' jours'"></span>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${overdueInvoices.size() == 0}" class="chart-card">
+                <div class="no-data">✓ Aucune facture en retard</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script th:if="${#authorization.expression('hasAuthority(''ROLE_ADMIN'')')}" th:inline="javascript">
+        // Parse JSON data from controller
+        const last12MonthsRaw = /*[[${last12MonthsJson}]]*/ '{}';
+        const invoicesByStatusRaw = /*[[${invoicesByStatusJson}]]*/ '{}';
+        const revenueByCustomerRaw = /*[[${revenueByCustomerJson}]]*/ '{}';
+
+        const parseObject = (value) => {
+            if (typeof value === 'string') {
+                try {
+                    return JSON.parse(value);
+                } catch (_) {
+                    return {};
+                }
+            }
+            return value || {};
+        };
+
+        const last12Months = parseObject(last12MonthsRaw);
+        const invoicesByStatus = parseObject(invoicesByStatusRaw);
+        const revenueByCustomer = parseObject(revenueByCustomerRaw);
+        
+        console.log('Last 12 months:', last12Months);
+        console.log('Status:', invoicesByStatus);
+        console.log('Customers:', revenueByCustomer);
+        
+        // Revenue Chart - 12 months
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        
+        const labels = Object.keys(last12Months);
+        const data = Object.values(last12Months);
+        
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Chiffre d\'affaires (€)',
+                    data: data,
+                    borderColor: '#a8d8ea',
+                    backgroundColor: 'rgba(168, 216, 234, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#1d3557',
+                    pointBorderColor: '#a8d8ea',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f0f0f0'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Status Chart - Pie
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(invoicesByStatus),
+                datasets: [{
+                    data: Object.values(invoicesByStatus),
+                    backgroundColor: ['#2a9d8f', '#f4a261', '#e0e0e0'],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Top Customers Chart - Horizontal Bar
+        const customersCtx = document.getElementById('customersChart').getContext('2d');
+        
+        const customerLabels = Object.keys(revenueByCustomer);
+        const customerData = Object.values(revenueByCustomer);
+        
+        new Chart(customersCtx, {
+            type: 'bar',
+            data: {
+                labels: customerLabels,
+                datasets: [{
+                    label: 'Chiffre d\'affaires (€)',
+                    data: customerData,
+                    backgroundColor: '#a8d8ea',
+                    borderColor: '#1d3557',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f0f0f0'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

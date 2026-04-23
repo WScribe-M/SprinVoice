@@ -19,4 +19,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
     
     @Query("SELECT i FROM Invoice i WHERE i.invoicedAt >= :startDate AND i.invoicedAt < :endDate")
     List<Invoice> findByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    @Query(value = "SELECT MAX(TO_NUMBER(SUBSTR(invoice_number, 10))) FROM INVOICE WHERE invoice_number LIKE :prefix", nativeQuery = true)
+    Integer findMaxCounterByYearPrefix(@Param("prefix") String prefix);
 }

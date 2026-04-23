@@ -1,9 +1,8 @@
 package fr.manu.sprinvoice.services;
 
 import fr.manu.sprinvoice.models.*;
-import fr.manu.sprinvoice.repositories.InvoiceRepository;
-import fr.manu.sprinvoice.repositories.InvoiceRowRepository;
 import fr.manu.sprinvoice.repositories.QuoteRepository;
+import fr.manu.sprinvoice.repositories.InvoiceRowRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,14 +13,14 @@ import java.util.List;
 public class QuoteService {
 
     private final QuoteRepository quoteRepository;
-    private final InvoiceRepository invoiceRepository;
+    private final InvoiceService invoiceService;
     private final InvoiceRowRepository invoiceRowRepository;
 
     public QuoteService(QuoteRepository quoteRepository,
-                        InvoiceRepository invoiceRepository,
+                        InvoiceService invoiceService,
                         InvoiceRowRepository invoiceRowRepository) {
         this.quoteRepository = quoteRepository;
-        this.invoiceRepository = invoiceRepository;
+        this.invoiceService = invoiceService;
         this.invoiceRowRepository = invoiceRowRepository;
     }
 
@@ -54,7 +53,7 @@ public class QuoteService {
         invoice.setDesignation(quote.getDesignation());
         invoice.setCustomer(quote.getCustomer());
         invoice.setCreatedAt(LocalDateTime.now());
-        Invoice saved = invoiceRepository.save(invoice);
+        Invoice saved = invoiceService.save(invoice);
 
         if (quote.getRows() != null) {
             for (QuoteRow qr : quote.getRows()) {

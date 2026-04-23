@@ -68,6 +68,9 @@
                 class="badge badge-unpaid">En attente</span>
         </div>
         <div class="meta">
+            <span th:if="${invoice.invoiceNumber != null}"
+                  th:text="${invoice.invoiceNumber}"
+                  style="font-weight:bold;margin-right:12px;"></span>
             <span sec:authorize="hasAuthority('ROLE_ADMIN')">
                 Client : <strong th:text="${invoice.customer != null} ? ${invoice.customer.name} : '–'"></strong>
                 &nbsp;·&nbsp;

@@ -94,7 +94,8 @@ public class InvoicePdfService {
         Paragraph title = new Paragraph();
         title.add(new Chunk("FACTURE", FONT_TITLE));
         title.add(Chunk.NEWLINE);
-        Phrase num = new Phrase("N° " + invoice.getId(), FontFactory.getFont(FontFactory.HELVETICA, 11, ORANGE));
+        String num_str = invoice.getInvoiceNumber() != null ? invoice.getInvoiceNumber() : "N° " + invoice.getId();
+        Phrase num = new Phrase(num_str, FontFactory.getFont(FontFactory.HELVETICA, 11, ORANGE));
         title.add(num);
         title.setAlignment(Element.ALIGN_RIGHT);
         PdfPCell titleCell = new PdfPCell(title);

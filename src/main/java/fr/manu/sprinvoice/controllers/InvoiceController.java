@@ -81,7 +81,8 @@ public class InvoiceController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("attachment", "facture-" + id + ".pdf");
+        String filename = invoice.getInvoiceNumber() != null ? invoice.getInvoiceNumber() + ".pdf" : "facture-" + id + ".pdf";
+        headers.setContentDispositionFormData("attachment", filename);
         return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
     }
 

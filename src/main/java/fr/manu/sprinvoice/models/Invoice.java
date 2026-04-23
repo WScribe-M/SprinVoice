@@ -13,6 +13,9 @@ public class Invoice {
     @SequenceGenerator(name = "invoice_seq", sequenceName = "INVOICE_SEQ", allocationSize = 1)
     private int id;
 
+    @Column(name = "INVOICE_NUMBER", unique = true)
+    private String invoiceNumber;
+
     @Column(name = "DESIGNATION")
     private String designation;
 
@@ -52,6 +55,9 @@ public class Invoice {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public String getInvoiceNumber() { return invoiceNumber; }
+    public void setInvoiceNumber(String invoiceNumber) { this.invoiceNumber = invoiceNumber; }
 
     public String getDesignation() {
         return designation;

@@ -60,14 +60,17 @@
 
     <table>
         <tr>
+            <th>N°</th>
             <th>Désignation</th>
             <th sec:authorize="hasAuthority('ROLE_ADMIN')">Client</th>
             <th>Créée le</th>
             <th>Statut</th>
-            <th>Total</th>
+            <th>Total HT</th>
             <th>Actions</th>
         </tr>
         <tr th:each="invoice : ${invoices}">
+            <td style="font-weight:bold;color:#1d3557;white-space:nowrap;"
+                th:text="${invoice.invoiceNumber} ?: '–'"></td>
             <td th:text="${invoice.designation}"></td>
             <td sec:authorize="hasAuthority('ROLE_ADMIN')"
                 th:text="${invoice.customer != null} ? ${invoice.customer.name} : '–'"></td>
@@ -92,7 +95,7 @@
             </td>
         </tr>
         <tr th:if="${#lists.isEmpty(invoices)}">
-            <td colspan="6" style="text-align:center;color:#999;padding:24px;">Aucune facture.</td>
+            <td colspan="7" style="text-align:center;color:#999;padding:24px;">Aucune facture.</td>
         </tr>
     </table>
 </div>

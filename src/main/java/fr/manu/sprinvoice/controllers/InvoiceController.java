@@ -6,6 +6,7 @@ import fr.manu.sprinvoice.models.Invoice;
 import fr.manu.sprinvoice.models.InvoiceRow;
 import fr.manu.sprinvoice.models.User;
 import fr.manu.sprinvoice.services.CustomerService;
+import fr.manu.sprinvoice.services.EmailService;
 import fr.manu.sprinvoice.services.InvoicePdfService;
 import fr.manu.sprinvoice.services.InvoiceRowService;
 import fr.manu.sprinvoice.services.InvoiceService;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,6 +36,7 @@ public class InvoiceController {
     @Autowired private ProductService productService;
     @Autowired private InvoiceRowService invoiceRowService;
     @Autowired private InvoicePdfService invoicePdfService;
+    @Autowired private EmailService emailService;
 
     // ── Accès CLIENT + ADMIN ──────────────────────────────────────
 
@@ -147,6 +150,27 @@ public class InvoiceController {
     public String deleteRow(@PathVariable int invoiceId, @PathVariable int rowId) {
         invoiceRowService.deleteById(rowId);
         return "redirect:/invoices/" + invoiceId;
+    }
+
+    @PostMapping("/admin/invoices/{id}/send")
+    public String sendToClient(@PathVariable int id, RedirectAttributes redirectAttributes) {
+        Invoice invoice = invoiceService.findById(id);
+        if (invoice.getCustomer() == null
+                || invoice.getCustomer().getEmail() == null
+                || invoice.getCustomer().getEmail().isBlank()) {
+            redirectAttributes.addFlashAttribute("error", "Aucune adresse email configurée pour ce client.");
+            return "redirect:/invoices/" + id;
+        }
+        List<InvoiceRow> rows = invoiceRowService.findByInvoiceId(id);
+        byte[] pdf = invoicePdfService.generate(invoice, rows);
+        try {
+            emailService.sendInvoice(invoice, pdf);
+            redirectAttributes.addFlashAttribute("success",
+                    "Facture envoyée à " + invoice.getCustomer().getEmail());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Erreur lors de l'envoi : " + e.getMessage());
+        }
+        return "redirect:/invoices/" + id;
     }
 
     @PostMapping("/admin/invoices/{id}/delete")

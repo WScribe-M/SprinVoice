@@ -29,6 +29,9 @@ public class Customer {
     @Column(name = "DELAY")
     private int delay;
 
+    @Column(name = "EMAIL")
+    private String email;
+
     public String getCorporateName() {
         return corporateName;
     }
@@ -85,4 +88,6 @@ public class Customer {
         this.delay = delay;
     }
 
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 }

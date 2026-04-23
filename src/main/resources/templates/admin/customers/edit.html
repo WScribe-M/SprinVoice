@@ -45,6 +45,10 @@
             <label>Délai de paiement (jours)</label>
             <input type="number" th:field="*{delay}" min="0"/>
         </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" th:field="*{email}"/>
+        </div>
         <div style="display:flex;gap:10px;margin-top:20px;">
             <button type="submit" class="btn btn-primary">Enregistrer</button>
             <a th:href="@{/admin/customers}" class="btn btn-secondary">Annuler</a>

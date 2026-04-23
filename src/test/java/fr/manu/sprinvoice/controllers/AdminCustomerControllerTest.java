@@ -191,7 +191,7 @@ class AdminCustomerControllerTest {
      */
     @Test
     void delete_asAdmin_redirectsToList() throws Exception {
-        doNothing().when(customerService).deleteById(3);
+        doNothing().when(customerService).deleteCustomerWithAllData(3);
 
         mockMvc.perform(post("/admin/customers/3/delete")
                         .with(csrf())

@@ -5,6 +5,8 @@ import fr.manu.sprinvoice.models.Customer;
 import fr.manu.sprinvoice.models.Role;
 import fr.manu.sprinvoice.models.User;
 import fr.manu.sprinvoice.repositories.CustomerRepository;
+import fr.manu.sprinvoice.repositories.InvoiceRepository;
+import fr.manu.sprinvoice.repositories.QuoteRepository;
 import fr.manu.sprinvoice.repositories.RoleRepository;
 import fr.manu.sprinvoice.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,8 @@ public class CustomerService {
     @Autowired private UserRepository userRepository;
     @Autowired private RoleRepository roleRepository;
     @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private InvoiceRepository invoiceRepository;
+    @Autowired private QuoteRepository quoteRepository;
 
     public List<Customer> findAll() {
         return customerRepository.findAll();
@@ -35,8 +39,37 @@ public class CustomerService {
         return customerRepository.save(customer);
     }
 
-    public void deleteById(int id) {
-        customerRepository.deleteById(id);
+    @Transactional
+    public void anonymize(int customerId) {
+        Customer customer = findById(customerId);
+        customer.setName("Client anonymisé");
+        customer.setCorporateName(null);
+        customer.setAddress(null);
+        customer.setZipcode(null);
+        customer.setCity(null);
+        customer.setEmail(null);
+        customerRepository.save(customer);
+
+        // Détache le lien User→Customer avant suppression pour éviter le cascade ALL
+        userRepository.findByCustomerId(customerId).ifPresent(user -> {
+            user.setCustomer(null);
+            userRepository.save(user);
+            userRepository.delete(user);
+        });
+    }
+
+    @Transactional
+    public void deleteCustomerWithAllData(int customerId) {
+        // Supprime les factures (cascade vers InvoiceRow)
+        invoiceRepository.deleteAll(invoiceRepository.findByCustomerId(customerId));
+        // Supprime les devis (cascade vers QuoteRow)
+        quoteRepository.deleteAll(quoteRepository.findByCustomerId(customerId));
+        // Supprime l'utilisateur lié — le cascade ALL sur User.customer supprime aussi le Customer
+        userRepository.findByCustomerId(customerId)
+                .ifPresentOrElse(
+                        userRepository::delete,
+                        () -> customerRepository.deleteById(customerId)
+                );
     }
 
     @Transactional
@@ -48,6 +81,7 @@ public class CustomerService {
         customer.setZipcode(dto.getZipcode());
         customer.setCity(dto.getCity());
         customer.setDelay(dto.getDelay());
+        customer.setEmail(dto.getEmail());
         customerRepository.save(customer);
 
         Role clientRole = roleRepository.findByName("ROLE_CLIENT")

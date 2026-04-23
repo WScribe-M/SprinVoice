@@ -77,7 +77,7 @@ public class Invoice {
         this.customer = customer;
     }
 
-    @OneToMany(mappedBy = "invoice")
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvoiceRow> rows;
 
     public List<InvoiceRow> getRows() { return rows; }

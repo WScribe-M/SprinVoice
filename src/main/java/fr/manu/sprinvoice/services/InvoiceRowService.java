@@ -1,5 +1,7 @@
 package fr.manu.sprinvoice.services;
 
+import fr.manu.sprinvoice.dto.RowFormDTO;
+import fr.manu.sprinvoice.models.Invoice;
 import fr.manu.sprinvoice.models.InvoiceRow;
 import fr.manu.sprinvoice.repositories.InvoiceRepository;
 import fr.manu.sprinvoice.repositories.InvoiceRowRepository;
@@ -28,6 +30,22 @@ public class InvoiceRowService {
                 .orElseThrow(() -> new RuntimeException("Produit introuvable : " + productId)));
         row.setQuantity(quantity);
         invoiceRowRepository.save(row);
+    }
+
+    public void replaceRows(int invoiceId, List<RowFormDTO> rowDTOs) {
+        invoiceRowRepository.deleteAll(invoiceRowRepository.findByInvoiceId(invoiceId));
+        if (rowDTOs == null) return;
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new RuntimeException("Facture introuvable : " + invoiceId));
+        for (RowFormDTO dto : rowDTOs) {
+            if (dto.getProductId() <= 0 || dto.getQuantity() <= 0) continue;
+            InvoiceRow row = new InvoiceRow();
+            row.setInvoice(invoice);
+            row.setProduct(productRepository.findById(dto.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Produit introuvable : " + dto.getProductId())));
+            row.setQuantity(dto.getQuantity());
+            invoiceRowRepository.save(row);
+        }
     }
 
     public void deleteById(int id) {

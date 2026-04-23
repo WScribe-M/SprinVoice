@@ -57,6 +57,12 @@
 <div th:replace="~{fragments/nav :: navbar}"></div>
 <div class="content">
 
+    <!-- Messages flash -->
+    <div th:if="${success}" th:text="${success}"
+         style="background:#d4edda;border:1px solid #c3e6cb;color:#155724;padding:10px 16px;border-radius:6px;margin-bottom:16px;font-size:13px;"></div>
+    <div th:if="${error}" th:text="${error}"
+         style="background:#f8d7da;border:1px solid #f5c6cb;color:#721c24;padding:10px 16px;border-radius:6px;margin-bottom:16px;font-size:13px;"></div>
+
     <!-- En-tête de la facture -->
     <div class="invoice-header">
         <div style="display:flex;align-items:center;gap:10px;">
@@ -107,8 +113,12 @@
     </div>
 
     <!-- Boutons admin -->
-    <div sec:authorize="hasAuthority('ROLE_ADMIN')" style="margin-bottom:16px;display:flex;gap:8px;">
+    <div sec:authorize="hasAuthority('ROLE_ADMIN')" style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;">
         <a th:href="@{/admin/invoices/{id}/edit(id=${invoice.id})}" class="btn btn-warning">Modifier</a>
+        <form th:action="@{/admin/invoices/{id}/send(id=${invoice.id})}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-primary"
+                    onclick="return confirm('Envoyer la facture par email au client ?')">✉ Envoyer au client</button>
+        </form>
         <form th:action="@{/admin/invoices/{id}/delete(id=${invoice.id})}" method="post" style="display:inline;">
             <button type="submit" class="btn btn-danger"
                     onclick="return confirm('Supprimer cette facture ?')">Supprimer</button>

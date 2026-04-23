@@ -10,6 +10,7 @@ public class CreateCustomerDTO {
     private String zipcode;
     private String city;
     private int delay;
+    private String email;
 
     // Infos User
     @NotBlank
@@ -40,6 +41,9 @@ public class CreateCustomerDTO {
 
     public int getDelay() { return delay; }
     public void setDelay(int delay) { this.delay = delay; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }

@@ -197,19 +197,20 @@ public class InvoicePdfService {
         sectionTitle.setSpacingAfter(8);
         doc.add(sectionTitle);
 
-        PdfPTable table = new PdfPTable(5);
+        PdfPTable table = new PdfPTable(6);
         table.setWidthPercentage(100);
-        table.setWidths(new float[]{3f, 2f, 1.8f, 1f, 1.8f});
+        table.setWidths(new float[]{3f, 2f, 1.8f, 1f, 1f, 1.8f});
 
         addTh(table, "Produit");
         addTh(table, "Catégorie");
-        addTh(table, "Prix unitaire");
+        addTh(table, "Prix unitaire HT");
+        addTh(table, "TVA");
         addTh(table, "Qté");
-        addTh(table, "Montant");
+        addTh(table, "Montant HT");
 
         if (rows == null || rows.isEmpty()) {
             PdfPCell empty = new PdfPCell(new Phrase("Aucune ligne de facturation.", FONT_VALUE));
-            empty.setColspan(5);
+            empty.setColspan(6);
             empty.setHorizontalAlignment(Element.ALIGN_CENTER);
             empty.setBorder(Rectangle.BOX);
             empty.setBorderColor(new Color(0xdd, 0xe3, 0xea));
@@ -222,6 +223,7 @@ public class InvoicePdfService {
                 addTd(table, row.getProduct() != null ? row.getProduct().getDesignation() : "–", bg, Element.ALIGN_LEFT);
                 addTd(table, row.getProduct() != null ? nvl(row.getProduct().getCategory()) : "–", bg, Element.ALIGN_LEFT);
                 addTd(table, row.getProduct() != null ? String.format("%.2f €", row.getProduct().getUnitPrice()) : "–", bg, Element.ALIGN_RIGHT);
+                addTd(table, row.getProduct() != null ? row.getProduct().getTvaRate() + " %" : "–", bg, Element.ALIGN_CENTER);
                 addTd(table, row.getQuantity() != null ? String.valueOf(row.getQuantity()) : "–", bg, Element.ALIGN_CENTER);
                 addTd(table, String.format("%.2f €", row.amount()), bg, Element.ALIGN_RIGHT);
                 alt = !alt;
@@ -237,24 +239,35 @@ public class InvoicePdfService {
         table.setWidthPercentage(40);
         table.setHorizontalAlignment(Element.ALIGN_RIGHT);
 
-        PdfPCell lbl = new PdfPCell(new Phrase("Total HT", FONT_TOTAL_LBL));
-        lbl.setBorder(Rectangle.TOP);
+        addTotalRow(table, "Total HT",  String.format("%.2f €", invoice.total()),    false);
+        addTotalRow(table, "TVA",       String.format("%.2f €", invoice.totalTva()), false);
+        addTotalRow(table, "Total TTC", String.format("%.2f €", invoice.totalTtc()), true);
+
+        doc.add(table);
+    }
+
+    private void addTotalRow(PdfPTable table, String label, String value, boolean highlight) {
+        Font lblFont = highlight ? FONT_TOTAL_VAL  : FONT_TOTAL_LBL;
+        Font valFont = highlight ? FONT_TOTAL_VAL  : FONT_TOTAL_VAL;
+        Color valBg  = highlight ? new Color(0xea, 0xf2, 0xfb) : LIGHT_GREY;
+
+        PdfPCell lbl = new PdfPCell(new Phrase(label, lblFont));
+        lbl.setBorder(highlight ? Rectangle.TOP : Rectangle.NO_BORDER);
         lbl.setBorderColor(DARK_BLUE);
-        lbl.setBorderWidth(2f);
-        lbl.setPadding(10);
+        lbl.setBorderWidth(highlight ? 2f : 0f);
+        lbl.setPadding(8);
         lbl.setHorizontalAlignment(Element.ALIGN_RIGHT);
 
-        PdfPCell val = new PdfPCell(new Phrase(String.format("%.2f €", invoice.total()), FONT_TOTAL_VAL));
-        val.setBorder(Rectangle.TOP);
+        PdfPCell val = new PdfPCell(new Phrase(value, valFont));
+        val.setBorder(highlight ? Rectangle.TOP : Rectangle.NO_BORDER);
         val.setBorderColor(DARK_BLUE);
-        val.setBorderWidth(2f);
-        val.setPadding(10);
+        val.setBorderWidth(highlight ? 2f : 0f);
+        val.setPadding(8);
         val.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        val.setBackgroundColor(LIGHT_GREY);
+        val.setBackgroundColor(valBg);
 
         table.addCell(lbl);
         table.addCell(val);
-        doc.add(table);
     }
 
     // ── Utilitaires ──────────────────────────────────────────────

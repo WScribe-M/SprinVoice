@@ -57,4 +57,12 @@ public class InvoiceRow {
         if (product == null || quantity == null) return 0f;
         return quantity * product.getUnitPrice();
     }
+
+    public float amountTva() {
+        return amount() * product.getTvaRate() / 100f;
+    }
+
+    public float amountTtc() {
+        return amount() + amountTva();
+    }
 }

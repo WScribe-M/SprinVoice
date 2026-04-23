@@ -56,8 +56,15 @@ public class Quote {
 
     public float total() {
         if (rows == null) return 0f;
-        return rows.stream()
-                .map(QuoteRow::amount)
-                .reduce(0f, Float::sum);
+        return rows.stream().map(QuoteRow::amount).reduce(0f, Float::sum);
+    }
+
+    public float totalTva() {
+        if (rows == null) return 0f;
+        return rows.stream().map(QuoteRow::amountTva).reduce(0f, Float::sum);
+    }
+
+    public float totalTtc() {
+        return total() + totalTva();
     }
 }

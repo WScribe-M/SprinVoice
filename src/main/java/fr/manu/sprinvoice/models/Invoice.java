@@ -85,8 +85,15 @@ public class Invoice {
 
     public float total() {
         if (rows == null) return 0f;
-        return rows.stream()
-                .map(InvoiceRow::amount)
-                .reduce(0f, Float::sum);
+        return rows.stream().map(InvoiceRow::amount).reduce(0f, Float::sum);
+    }
+
+    public float totalTva() {
+        if (rows == null) return 0f;
+        return rows.stream().map(InvoiceRow::amountTva).reduce(0f, Float::sum);
+    }
+
+    public float totalTtc() {
+        return total() + totalTva();
     }
 }

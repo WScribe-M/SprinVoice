@@ -1,6 +1,7 @@
 package fr.manu.sprinvoice.controllers;
 
 import fr.manu.sprinvoice.dto.InvoiceFormDTO;
+import fr.manu.sprinvoice.dto.RowFormDTO;
 import fr.manu.sprinvoice.models.Invoice;
 import fr.manu.sprinvoice.models.InvoiceRow;
 import fr.manu.sprinvoice.models.User;
@@ -23,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class InvoiceController {
@@ -89,6 +91,7 @@ public class InvoiceController {
     public String createForm(Model model) {
         model.addAttribute("dto", new InvoiceFormDTO());
         model.addAttribute("customers", customerService.findAll());
+        model.addAttribute("products", productService.findAll());
         return "invoices/form";
     }
 
@@ -101,8 +104,15 @@ public class InvoiceController {
         dto.setCustomerId(invoice.getCustomer() != null ? invoice.getCustomer().getId() : 0);
         dto.setInvoicedAt(invoice.getInvoicedAt() != null ? invoice.getInvoicedAt().toLocalDate().toString() : "");
         dto.setPaidAt(invoice.getPaidAt() != null ? invoice.getPaidAt().toLocalDate().toString() : "");
+
+        List<RowFormDTO> rowDTOs = invoiceRowService.findByInvoiceId(id).stream()
+                .map(r -> { RowFormDTO rd = new RowFormDTO(); rd.setProductId(r.getProduct().getId()); rd.setQuantity(r.getQuantity()); return rd; })
+                .collect(Collectors.toList());
+        dto.setRows(rowDTOs);
+
         model.addAttribute("dto", dto);
         model.addAttribute("customers", customerService.findAll());
+        model.addAttribute("products", productService.findAll());
         return "invoices/form";
     }
 
@@ -120,6 +130,7 @@ public class InvoiceController {
         invoice.setInvoicedAt(toDateTime(dto.getInvoicedAt()));
         invoice.setPaidAt(toDateTime(dto.getPaidAt()));
         Invoice saved = invoiceService.save(invoice);
+        invoiceRowService.replaceRows(saved.getId(), dto.getRows());
         return "redirect:/invoices/" + saved.getId();
     }
 

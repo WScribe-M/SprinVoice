@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Détail devis</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f5f7fa; }
+        .content { padding: 24px; max-width: 860px; }
+
+        .quote-header { background: #1d3557; color: #fff; border-radius: 8px; padding: 24px 28px; margin-bottom: 20px; }
+        .quote-header h1 { margin: 0 0 6px 0; font-size: 22px; }
+        .quote-header .meta { font-size: 13px; color: #a8d8ea; }
+        .quote-header .badge { margin-left: 12px; font-size: 12px; font-weight: bold; padding: 3px 12px; border-radius: 12px; }
+        .badge-brouillon { background: #e9ecef; color: #495057; }
+        .badge-envoye    { background: #cce5ff; color: #004085; }
+        .badge-accepte   { background: #d4edda; color: #155724; }
+        .badge-refuse    { background: #f8d7da; color: #721c24; }
+        .badge-converti  { background: #e2d9f3; color: #4a235a; }
+
+        .info-row { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+        .info-card { background: #fff; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.08); padding: 16px 20px; flex: 1; min-width: 160px; }
+        .info-card .card-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+        .info-card .card-value { font-size: 16px; color: #1d3557; font-weight: bold; }
+        .info-card.highlight { border-left: 4px solid #1d3557; }
+        .info-card.warning   { border-left: 4px solid #f4a261; }
+
+        .section { background: #fff; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.08); padding: 20px; margin-bottom: 20px; }
+        .section h2 { color: #1d3557; font-size: 16px; margin: 0 0 14px 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f0f4f8; color: #1d3557; padding: 9px 12px; text-align: left; font-size: 13px; border-bottom: 2px solid #d0dce8; }
+        td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+        tr:last-child td { border-bottom: none; }
+        .total-row td { font-weight: bold; background: #eaf2fb; font-size: 15px; }
+        .total-amount { color: #1d3557; font-size: 18px; }
+
+        .add-row-form { display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; margin-top:16px; padding-top:16px; border-top:1px dashed #ccc; }
+        .add-row-form .fg { display:flex; flex-direction:column; gap:4px; }
+        .add-row-form label { font-size:12px; color:#555; }
+        .add-row-form select, .add-row-form input { padding:8px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+
+        .btn { display:inline-block; padding:8px 16px; border-radius:4px; text-decoration:none; font-size:13px; border:none; cursor:pointer; }
+        .btn-primary   { background:#1d3557; color:#fff; }
+        .btn-warning   { background:#f4a261; color:#fff; }
+        .btn-danger    { background:#e63946; color:#fff; }
+        .btn-secondary { background:#dde3ea; color:#333; }
+        .btn-success   { background:#2d6a4f; color:#fff; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+<div class="content">
+
+    <!-- En-tête du devis -->
+    <div class="quote-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <h1 th:text="${quote.designation}">Désignation</h1>
+            <span th:if="${quote.status == T(fr.manu.sprinvoice.models.QuoteStatus).BROUILLON}" class="badge badge-brouillon">Brouillon</span>
+            <span th:if="${quote.status == T(fr.manu.sprinvoice.models.QuoteStatus).ENVOYE}"    class="badge badge-envoye">Envoyé</span>
+            <span th:if="${quote.status == T(fr.manu.sprinvoice.models.QuoteStatus).ACCEPTE}"   class="badge badge-accepte">Accepté</span>
+            <span th:if="${quote.status == T(fr.manu.sprinvoice.models.QuoteStatus).REFUSE}"    class="badge badge-refuse">Refusé</span>
+            <span th:if="${quote.status == T(fr.manu.sprinvoice.models.QuoteStatus).CONVERTI}"  class="badge badge-converti">Converti en facture</span>
+            <span th:if="${quote.status == null}" class="badge badge-brouillon">Brouillon</span>
+        </div>
+        <div class="meta">
+            <span sec:authorize="hasAuthority('ROLE_ADMIN')">
+                Client : <strong th:text="${quote.customer != null} ? ${quote.customer.name} : '–'"></strong>
+                &nbsp;·&nbsp;
+            </span>
+            Créé le :
+            <span th:text="${quote.createdAt != null} ? ${#temporals.format(quote.createdAt,'dd/MM/yyyy')} : '–'"></span>
+        </div>
+    </div>
+
+    <!-- Cartes d'information -->
+    <div class="info-row">
+        <div class="info-card highlight">
+            <div class="card-label">Date de création</div>
+            <div class="card-value"
+                 th:text="${quote.createdAt != null} ? ${#temporals.format(quote.createdAt,'dd/MM/yyyy')} : '–'"></div>
+        </div>
+        <div class="info-card warning">
+            <div class="card-label">Date d'expiration</div>
+            <div class="card-value"
+                 th:text="${quote.expiresAt != null} ? ${#temporals.format(quote.expiresAt,'dd/MM/yyyy')} : '–'"></div>
+        </div>
+        <div class="info-card">
+            <div class="card-label">Client</div>
+            <div class="card-value"
+                 th:text="${quote.customer != null} ? ${quote.customer.name} : '–'"></div>
+        </div>
+        <div class="info-card">
+            <div class="card-label">Délai de paiement</div>
+            <div class="card-value"
+                 th:text="${quote.customer != null} ? ${quote.customer.delay} + ' jours' : '–'"></div>
+        </div>
+    </div>
+
+    <!-- Boutons admin -->
+    <div sec:authorize="hasAuthority('ROLE_ADMIN')" style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;">
+        <a th:href="@{/admin/quotes/{id}/edit(id=${quote.id})}" class="btn btn-warning">Modifier</a>
+        <form th:if="${quote.status != T(fr.manu.sprinvoice.models.QuoteStatus).CONVERTI}"
+              th:action="@{/admin/quotes/{id}/convert(id=${quote.id})}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-success"
+                    onclick="return confirm('Convertir ce devis en facture ?')">Convertir en facture</button>
+        </form>
+        <form th:action="@{/admin/quotes/{id}/delete(id=${quote.id})}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger"
+                    onclick="return confirm('Supprimer ce devis ?')">Supprimer</button>
+        </form>
+    </div>
+
+    <!-- Lignes du devis -->
+    <div class="section">
+        <h2>Lignes du devis</h2>
+        <table>
+            <tr>
+                <th>Produit</th>
+                <th>Catégorie</th>
+                <th>Prix unitaire</th>
+                <th>Quantité</th>
+                <th>Montant</th>
+                <th sec:authorize="hasAuthority('ROLE_ADMIN')" style="width:50px;"></th>
+            </tr>
+            <tr th:each="row : ${rows}">
+                <td th:text="${row.product.designation}"></td>
+                <td th:text="${row.product.category}"></td>
+                <td th:text="${#numbers.formatDecimal(row.product.unitPrice, 1, 2)} + ' €'"></td>
+                <td th:text="${row.quantity}"></td>
+                <td th:text="${#numbers.formatDecimal(row.amount(), 1, 2)} + ' €'"></td>
+                <td sec:authorize="hasAuthority('ROLE_ADMIN')">
+                    <form th:action="@{/admin/quotes/{qid}/rows/{rid}/delete(qid=${quote.id},rid=${row.id})}"
+                          method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Supprimer cette ligne ?')">✕</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(rows)}">
+                <td colspan="6" style="text-align:center;color:#999;padding:20px;">Aucune ligne.</td>
+            </tr>
+            <tr class="total-row" th:if="${!#lists.isEmpty(rows)}">
+                <td colspan="4" style="text-align:right;color:#555;">Total HT</td>
+                <td class="total-amount" th:text="${#numbers.formatDecimal(quote.total(), 1, 2)} + ' €'"></td>
+                <td sec:authorize="hasAuthority('ROLE_ADMIN')"></td>
+            </tr>
+        </table>
+
+        <!-- Ajout de ligne – admin seulement -->
+        <form sec:authorize="hasAuthority('ROLE_ADMIN')"
+              th:if="${quote.status != T(fr.manu.sprinvoice.models.QuoteStatus).CONVERTI}"
+              th:action="@{/admin/quotes/{id}/rows/add(id=${quote.id})}" method="post"
+              class="add-row-form">
+            <div class="fg">
+                <label>Produit</label>
+                <select name="productId" required>
+                    <option value="0">-- Choisir un produit --</option>
+                    <option th:each="p : ${products}" th:value="${p.id}"
+                            th:text="${p.designation} + ' (' + ${#numbers.formatDecimal(p.unitPrice,1,2)} + ' €)'">
+                    </option>
+                </select>
+            </div>
+            <div class="fg">
+                <label>Quantité</label>
+                <input type="number" name="quantity" value="1" min="1" step="1" style="width:90px;" required/>
+            </div>
+            <button type="submit" class="btn btn-primary">Ajouter la ligne</button>
+        </form>
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center;">
+        <a th:href="@{/quotes}" class="btn btn-secondary">← Retour à la liste</a>
+    </div>
+</div>
+</body>
+</html>

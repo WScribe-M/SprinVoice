@@ -6,6 +6,7 @@
     <strong style="color:#fff;font-size:18px;">SprinVoice</strong>
     <a th:href="@{/dashboard}" style="color:#a8d8ea;text-decoration:none;">Dashboard</a>
     <a th:href="@{/invoices}" style="color:#a8d8ea;text-decoration:none;">Factures</a>
+    <a th:href="@{/quotes}" style="color:#a8d8ea;text-decoration:none;">Devis</a>
     <span sec:authorize="hasAuthority('ROLE_ADMIN')" style="display:contents;">
         <a th:href="@{/admin/customers}" style="color:#a8d8ea;text-decoration:none;">Clients</a>
         <a th:href="@{/admin/products}" style="color:#a8d8ea;text-decoration:none;">Produits</a>

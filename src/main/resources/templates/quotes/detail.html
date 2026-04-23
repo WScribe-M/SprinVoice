@@ -118,15 +118,17 @@
             <tr>
                 <th>Produit</th>
                 <th>Catégorie</th>
-                <th>Prix unitaire</th>
+                <th>Prix unitaire HT</th>
+                <th>TVA</th>
                 <th>Quantité</th>
-                <th>Montant</th>
+                <th>Montant HT</th>
                 <th sec:authorize="hasAuthority('ROLE_ADMIN')" style="width:50px;"></th>
             </tr>
             <tr th:each="row : ${rows}">
                 <td th:text="${row.product.designation}"></td>
                 <td th:text="${row.product.category}"></td>
                 <td th:text="${#numbers.formatDecimal(row.product.unitPrice, 1, 2)} + ' €'"></td>
+                <td th:text="${row.product.tvaRate} + ' %'"></td>
                 <td th:text="${row.quantity}"></td>
                 <td th:text="${#numbers.formatDecimal(row.amount(), 1, 2)} + ' €'"></td>
                 <td sec:authorize="hasAuthority('ROLE_ADMIN')">
@@ -138,11 +140,21 @@
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(rows)}">
-                <td colspan="6" style="text-align:center;color:#999;padding:20px;">Aucune ligne.</td>
+                <td colspan="7" style="text-align:center;color:#999;padding:20px;">Aucune ligne.</td>
+            </tr>
+            <tr th:if="${!#lists.isEmpty(rows)}" style="background:#f8f9fa;">
+                <td colspan="5" style="text-align:right;color:#555;">Total HT</td>
+                <td th:text="${#numbers.formatDecimal(quote.total(), 1, 2)} + ' €'"></td>
+                <td sec:authorize="hasAuthority('ROLE_ADMIN')"></td>
+            </tr>
+            <tr th:if="${!#lists.isEmpty(rows)}" style="background:#f8f9fa;">
+                <td colspan="5" style="text-align:right;color:#555;">TVA</td>
+                <td th:text="${#numbers.formatDecimal(quote.totalTva(), 1, 2)} + ' €'"></td>
+                <td sec:authorize="hasAuthority('ROLE_ADMIN')"></td>
             </tr>
             <tr class="total-row" th:if="${!#lists.isEmpty(rows)}">
-                <td colspan="4" style="text-align:right;color:#555;">Total HT</td>
-                <td class="total-amount" th:text="${#numbers.formatDecimal(quote.total(), 1, 2)} + ' €'"></td>
+                <td colspan="5" style="text-align:right;color:#555;">Total TTC</td>
+                <td class="total-amount" th:text="${#numbers.formatDecimal(quote.totalTtc(), 1, 2)} + ' €'"></td>
                 <td sec:authorize="hasAuthority('ROLE_ADMIN')"></td>
             </tr>
         </table>

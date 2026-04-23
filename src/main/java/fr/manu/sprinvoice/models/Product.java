@@ -22,6 +22,9 @@ public class Product {
     @Column(name = "CATEGORY")
     private String category;
 
+    @Column(name = "TVA_RATE")
+    private Integer tvaRate; // pourcentage : 0, 10 ou 20
+
     public int getId() {
         return id;
     }
@@ -60,5 +63,13 @@ public class Product {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public int getTvaRate() {
+        return tvaRate != null ? tvaRate : 0;
+    }
+
+    public void setTvaRate(Integer tvaRate) {
+        this.tvaRate = tvaRate;
     }
 }

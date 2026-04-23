@@ -62,9 +62,15 @@ public class AdminCustomerController {
         return "redirect:/admin/customers";
     }
 
+    @PostMapping("/{id}/anonymize")
+    public String anonymize(@PathVariable int id) {
+        customerService.anonymize(id);
+        return "redirect:/admin/customers";
+    }
+
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable int id) {
-        customerService.deleteById(id);
+        customerService.deleteCustomerWithAllData(id);
         return "redirect:/admin/customers";
     }
 }
